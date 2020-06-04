@@ -1,11 +1,12 @@
-import express from 'express';
-import mysql from 'mysql';
+import express, { Application } from 'express';
 
-const app = express();
+import routes from './routes';
+import database from './database';
 
-app.get('/', (req, res) => {
-  res.send('Root of application');
-});
+const app: Application = express();
+
+routes(app);
+database();
 
 const PORT = process.env.PORT || 3000;
 
