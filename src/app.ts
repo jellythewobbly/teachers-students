@@ -5,9 +5,9 @@ import database from './database';
 
 const app: Application = express();
 
-routes(app);
 database();
+routes(app);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => console.log(`listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`listening on port ${PORT}......`));

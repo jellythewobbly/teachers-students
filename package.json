@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "setup-db": "chmod 755 config/seed.sh && config/seed.sh",
     "dev": "nodemon --exec ts-node src/app.ts",
     "tsc": "tsc"
   },
