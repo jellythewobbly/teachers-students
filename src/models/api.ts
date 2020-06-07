@@ -6,6 +6,10 @@ interface IUserID extends RowDataPacket {
   id: number;
 }
 
+interface IUserEmail extends RowDataPacket {
+  email: string;
+}
+
 const getTeacherID = async (teacher: string) => {
   const getTeacher = 'SELECT id FROM teacher WHERE teacher.email = ?';
   return pool.promise().query<IUserID[]>(getTeacher, [teacher]);
@@ -43,10 +47,43 @@ const registerStudent = async (teacher: string, students: string[]) => {
   return pool.promise().query(insertTeacherStudents, [teacherStudentPayload]);
 };
 
+interface IStudentCount {
+  [email: string]: number;
+}
+
+const getCommonStudents = async (teachers: string[]) => {
+  const commonStudents =
+    'SELECT student.email FROM ((registration INNER JOIN student ON registration.student_id = student.id) INNER JOIN teacher ON registration.teacher_id = teacher.id) WHERE teacher.email in (?)';
+
+  const [studentRows] = await pool
+    .promise()
+    .query<IUserEmail[]>(commonStudents, [teachers]);
+
+  if (studentRows.length === 0) {
+    return [];
+  }
+
+  if (teachers.length === 1) {
+    return studentRows.map((row: IUserEmail) => row.email);
+  }
+
+  const studentCount: IStudentCount = {};
+  studentRows.forEach((row: IUserEmail) => {
+    studentCount[row.email] = studentCount[row.email]
+      ? studentCount[row.email] + 1
+      : 1;
+  });
+
+  return Object.keys(studentCount).filter(
+    (email: string) => studentCount[email] === teachers.length
+  );
+};
+
 const apiModel = {
   getTeacherID,
   getStudentIDs,
   registerStudent,
+  getCommonStudents,
 };
 
 export default apiModel;

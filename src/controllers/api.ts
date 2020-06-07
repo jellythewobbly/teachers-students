@@ -32,4 +32,25 @@ router.post(ApiRoute.REGISTER_STUDENT, async (req: Request, res: Response) => {
   }
 });
 
+router.get(ApiRoute.COMMON_STUDENTS, async (req: Request, res: Response) => {
+  const teacherQuery = req.query.teacher;
+  let teachers = teacherQuery;
+  if (typeof teacherQuery === 'string') {
+    teachers = [teacherQuery];
+  }
+
+  try {
+    const commonStudents = await apiModel.getCommonStudents(
+      teachers as string[]
+    );
+    res.status(200);
+    res.json({
+      students: commonStudents,
+    });
+  } catch (err) {
+    res.status(404);
+    res.json({ Error: err.message });
+  }
+});
+
 export default router;
