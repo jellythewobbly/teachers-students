@@ -16,11 +16,13 @@ router.get(ApiRoute.ROOT, (_: Request, res: Response) => {
   res.send('Make a request to the API!');
 });
 
+interface IRegisterStudentPayload {
+  teacher: string;
+  students: string[];
+}
+
 router.post(ApiRoute.REGISTER_STUDENT, async (req: Request, res: Response) => {
-  const {
-    teacher,
-    students,
-  }: { teacher: string; students: string[] } = req.body;
+  const { teacher, students }: IRegisterStudentPayload = req.body;
 
   try {
     await apiModel.registerStudent(teacher, students);
@@ -49,8 +51,11 @@ router.get(ApiRoute.COMMON_STUDENTS, async (req: Request, res: Response) => {
   }
 });
 
+interface ISuspendStudentPayload {
+  student: string;
+}
 router.post(ApiRoute.SUSPEND_STUDENT, async (req: Request, res: Response) => {
-  const { student }: { student: string } = req.body;
+  const { student }: ISuspendStudentPayload = req.body;
 
   try {
     await apiModel.suspendStudent(student);
