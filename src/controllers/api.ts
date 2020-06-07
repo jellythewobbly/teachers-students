@@ -24,11 +24,9 @@ router.post(ApiRoute.REGISTER_STUDENT, async (req: Request, res: Response) => {
 
   try {
     await apiModel.registerStudent(teacher, students);
-    res.status(204);
-    res.send('OK');
+    res.status(204).send();
   } catch (err) {
-    res.status(404);
-    res.json({ Error: err.message });
+    res.status(404).json({ Error: err.message });
   }
 });
 
@@ -43,13 +41,22 @@ router.get(ApiRoute.COMMON_STUDENTS, async (req: Request, res: Response) => {
     const commonStudents = await apiModel.getCommonStudents(
       teachers as string[]
     );
-    res.status(200);
-    res.json({
+    res.status(200).json({
       students: commonStudents,
     });
   } catch (err) {
-    res.status(404);
-    res.json({ Error: err.message });
+    res.status(404).json({ Error: err.message });
+  }
+});
+
+router.post(ApiRoute.SUSPEND_STUDENT, async (req: Request, res: Response) => {
+  const { student }: { student: string } = req.body;
+
+  try {
+    await apiModel.suspendStudent(student);
+    res.status(204).send();
+  } catch (err) {
+    res.status(404).json({ Error: err.message });
   }
 });
 
