@@ -1,13 +1,14 @@
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
-export default () => {
-  const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'teachers_students',
-  });
-  db.connect((err: Error) => {
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'teachers_students',
+});
+
+export const initDB = () => {
+  pool.getConnection((err: Error) => {
     if (err) {
       console.error(err.message);
       throw err;
@@ -15,3 +16,5 @@ export default () => {
     console.log('Connected to MySQL database');
   });
 };
+
+export default pool;

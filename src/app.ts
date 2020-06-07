@@ -1,11 +1,11 @@
 import express, { Application } from 'express';
 
 import routes from './routes';
-import database from './database';
+import { initDB } from './database';
 
 const app: Application = express();
 
-database();
+initDB();
 routes(app);
 
 const PORT = process.env.PORT || 3000;
