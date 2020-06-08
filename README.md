@@ -21,7 +21,7 @@
 1. As a teacher, I want to register one or more students to a specified teacher. (DONE)
 2. As a teacher, I want to retrieve a list of students common to a given list of teachers (i.e. retrieve students who are registered to ALL of the given teachers). (DONE)
 3. As a teacher, I want to suspend a specified student. (DONE)
-4. As a teacher, I want to retrieve a list of students who can receive a given notification. (WIP)
+4. As a teacher, I want to retrieve a list of students who can receive a given notification. (DONE)
 
 ## Pending tasks:
 

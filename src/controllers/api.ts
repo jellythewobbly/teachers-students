@@ -65,4 +65,37 @@ router.post(ApiRoute.SUSPEND_STUDENT, async (req: Request, res: Response) => {
   }
 });
 
+interface IRetrieveForNotificationsPayload {
+  teacher: string;
+  notification: string;
+}
+
+const parseMentionToEmail = (input: string) => input.slice(1);
+
+router.post(
+  ApiRoute.RETRIEVE_FOR_NOTIFICATIONS,
+  async (req: Request, res: Response) => {
+    const {
+      teacher,
+      notification,
+    }: IRetrieveForNotificationsPayload = req.body;
+    const mentionedStudents = notification
+      .split(' ')
+      .filter((item: string) => item[0] === '@')
+      .map((mention: string) => parseMentionToEmail(mention));
+
+    try {
+      const studentsForNotifications = await apiModel.retrieveForNotifications(
+        teacher,
+        mentionedStudents
+      );
+      res.status(200).json({
+        recipients: studentsForNotifications,
+      });
+    } catch (err) {
+      res.status(404).json({ Error: err.message });
+    }
+  }
+);
+
 export default router;

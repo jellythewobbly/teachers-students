@@ -16,7 +16,7 @@ const getTeacherID = async (teacher: string) => {
 };
 
 const getStudentIDs = async (students: string[]) => {
-  const getStudentsQuery = 'SELECT id FROM student WHERE email in (?)';
+  const getStudentsQuery = 'SELECT id FROM student WHERE email IN (?)';
   return pool.promise().query<IUserID[]>(getStudentsQuery, [students]);
 };
 
@@ -55,7 +55,7 @@ interface IStudentCount {
 
 const getCommonStudents = async (teachers: string[]) => {
   const commonStudentsQuery =
-    'SELECT student.email FROM ((registration INNER JOIN student ON registration.student_id = student.id) INNER JOIN teacher ON registration.teacher_id = teacher.id) WHERE teacher.email in (?)';
+    'SELECT student.email FROM ((registration INNER JOIN student ON registration.student_id = student.id) INNER JOIN teacher ON registration.teacher_id = teacher.id) WHERE teacher.email IN (?)';
 
   const [studentRows] = await pool
     .promise()
@@ -98,10 +98,36 @@ const suspendStudent = async (student: string) => {
   return await pool.promise().query<OkPacket>(suspendStudentQuery, student);
 };
 
+const retrieveForNotifications = async (
+  teacher: string,
+  students: string[]
+) => {
+  const retrieveForNotificationsQuery =
+    'SELECT email FROM (SELECT student.email, student.is_suspended FROM ((registration INNER JOIN student ON registration.student_id = student.id) INNER JOIN teacher ON registration.teacher_id = teacher.id) WHERE teacher.email = ?) AS T WHERE is_suspended = 0';
+
+  const retrieveForNotificationsQueryWithStudents =
+    'SELECT email FROM (SELECT student.email, student.is_suspended FROM ((registration INNER JOIN student ON registration.student_id = student.id) INNER JOIN teacher ON registration.teacher_id = teacher.id) WHERE teacher.email = ? UNION SELECT email, is_suspended FROM student WHERE email IN (?)) AS T WHERE is_suspended = 0';
+
+  if (students.length) {
+    const [studentRows] = await pool
+      .promise()
+      .query<IUserEmail[]>(retrieveForNotificationsQueryWithStudents, [
+        teacher,
+        students,
+      ]);
+    return studentRows.map(row => row.email);
+  }
+  const [studentRows] = await pool
+    .promise()
+    .query<IUserEmail[]>(retrieveForNotificationsQuery, [teacher]);
+  return studentRows.map(row => row.email);
+};
+
 const apiModel = {
   registerStudent,
   getCommonStudents,
   suspendStudent,
+  retrieveForNotifications,
 };
 
 export default apiModel;
